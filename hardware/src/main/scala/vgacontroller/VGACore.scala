@@ -6,9 +6,11 @@
  * Blinking LED: the FPGA version of Hello World
  */
 
-package VGADriver
+package VGACore
 
 import chisel3._
+
+import ocp.{OcpCoreSlavePort, _}
 
 import VGAController._
 
@@ -16,7 +18,7 @@ import VGAController._
  * The blinking LED component.
  */
 
-class VGADriver extends Module {
+class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extends Module {
   val io = IO(new Bundle {
     val pixel_clock = Output(UInt(1.W))
     val n_sync = Output(UInt(1.W))
@@ -28,6 +30,8 @@ class VGADriver extends Module {
     val R = Output(UInt(8.W))
     val G = Output(UInt(8.W))
     val B = Output(UInt(8.W))
+
+    val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
   })
 
   io.n_sync := 0.U // Pulled to 0 because sync using green channel not use
@@ -42,11 +46,4 @@ class VGADriver extends Module {
   io.R := controller.io.R
   io.G := controller.io.G
   io.B := controller.io.B
-}
-
-/**
- * An object extending App to generate the Verilog code.
- */
-object VGADriver extends App {
-  chisel3.Driver.execute(Array[String](), () => new VGADriver())
 }

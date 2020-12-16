@@ -19,6 +19,8 @@ import datacache._
 import ocp.{OcpCoreSlavePort, _}
 import argo._
 
+import VGACore._
+
 import scala.collection.immutable.Stream.Empty
 import scala.collection.mutable
 
@@ -167,12 +169,6 @@ class PatmosCore(binFile: String, nr: Int, cnt: Int) extends Module {
 
   // Keep signal alive for debugging
   //debug(enableReg) does nothing in chisel3 (no proning in frontend of chisel3 anyway)
-}
-
-class VGACore(nr: Int) extends Module {
-  val io = IO(new Bundle() {
-    val memPort = new OcpBurstMasterPort(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)
-  })
 }
 
 trait HasPins {
@@ -437,7 +433,7 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
   registerPins(ramConf.name, ramCtrl.io)
 
   //Create VGA Module
-  val vga = Module(new VGACore(nrCores)) // append as last
+  val vga = Module(new VGACore(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)) // append as last
 
   // TODO: fix memory arbiter to have configurable memory timing.
   // E.g., it does not work with on-chip main memory.
