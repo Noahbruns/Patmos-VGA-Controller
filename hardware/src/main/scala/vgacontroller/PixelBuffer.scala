@@ -1,5 +1,7 @@
 package PixelBuffer
 
+import ocp.{OcpCoreSlavePort, _}
+
 import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.loadMemoryFromFile
@@ -23,10 +25,7 @@ class LineMemory() extends Module {
   }
 }
 
-class PixelBuffer() extends Module {
-  val line_width = 800
-  val display_height = 600
-
+class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, data_width: Int) extends Module {
   val io = IO(new Bundle {
     val new_frame = Input(UInt(1.W))
 
@@ -37,52 +36,19 @@ class PixelBuffer() extends Module {
     val B = Output(UInt(8.W))
     val h_pos = Input(UInt(log2Ceil(line_width).W))
     val v_pos = Input(UInt(log2Ceil(display_height).W))
+
+    val mem_addr = Output(UInt(extmem_addr_width.W))
+    val read = Output(Bool())
+    val mem_data = Input(UInt(data_width.W))
   })
 
   val memory = Module(new LineMemory())
 
-  //A few colors
-  val lila = RegInit(18532.U(16.W)) 
-  val blue = RegInit(13298.U(16.W))
-  val green = RegInit(2610.U(16.W)) 
-  val yellow = RegInit(59150.U(16.W)) 
-  val orange = RegInit(58304.U(16.W)) 
-  val red = RegInit(51336.U(16.W))
+  // Read from Memory
+  io.mem_addr  := 0.U
+  io.read      := false.B
 
-  memory.io.wrEna  := false.B
-  memory.io.wrAddr := 0.U
-  memory.io.wrData := 0.U
-
-  //Used to fill the memory 
-  val colorCount = RegInit(0.U(log2Ceil(1600).W))
-  when(colorCount <= 1600.U){
-    memory.io.wrEna  := true.B
-    memory.io.wrAddr := colorCount
-
-    switch ((colorCount % 800.U) / 134.U) {
-      is (0.U) {
-        memory.io.wrData := lila
-      }
-      is (1.U) {
-        memory.io.wrData := blue
-      }
-      is (2.U) {
-        memory.io.wrData := green
-      }
-      is (3.U) {
-        memory.io.wrData := yellow
-      }
-      is (4.U) {
-        memory.io.wrData := orange
-      }
-      is (5.U) {
-        memory.io.wrData := red
-      }
-    }
-
-    colorCount := colorCount + 1.U
-  }
-
+  // Write Out
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories
     when(io.enable === 1.U) {
       memory.io.rdAddr := io.h_pos

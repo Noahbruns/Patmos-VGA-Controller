@@ -36,7 +36,7 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
 
   io.n_sync := 0.U // Pulled to 0 because sync using green channel not use
 
-  val controller = Module(new VGAController())
+  val controller = Module(new VGAController(extmem_addr_width, data_width))
 
   io.pixel_clock := controller.io.pixel_clock
   io.n_blank := controller.io.n_blank
@@ -46,4 +46,8 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   io.R := controller.io.R
   io.G := controller.io.G
   io.B := controller.io.B
+
+  //controller.io.mem_addr := io.memPort.Addr
+  //controller.io.read := io.memPort
+  //controller.io.mem_data := io.memPort
 }
