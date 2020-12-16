@@ -709,7 +709,7 @@ static void emu_extmem() {
 // Note: VL_USER_FINISH needs to be defined when compiling Verilator code
 void vl_finish(const char *filename, int linenum, const char *hier)
 {
-  Verilated::flushCall();
+  //Verilated::flushCall();
   exit(0);
 }
 
