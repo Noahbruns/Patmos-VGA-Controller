@@ -6,8 +6,8 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.loadMemoryFromFile
 
-class LineMemory() extends Module {
-  val size = 800 * 2
+class LineMemory(line_width: Int) extends Module {
+  val size = line_width * 2
 
   val io = IO(new Bundle {
     val rdAddr = Input(UInt(log2Ceil(size).W)) 
@@ -42,7 +42,7 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
     val mem_data = Input(UInt(data_width.W))
   })
 
-  val memory = Module(new LineMemory())
+  val memory = Module(new LineMemory(line_width))
 
   // Read from Memory
   io.mem_addr  := 0.U
