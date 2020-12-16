@@ -20,7 +20,8 @@ class VGAController(extmem_addr_width: Int, data_width: Int) extends Module {
     val B = Output(UInt(8.W))
 
     val mem_addr = Output(UInt(extmem_addr_width.W))
-    val read = Output(Bool())
+    val mem_read = Output(Bool())
+    val mem_valid = Input(Bool())
     val mem_data = Input(UInt(data_width.W))
   })
 
@@ -66,7 +67,8 @@ class VGAController(extmem_addr_width: Int, data_width: Int) extends Module {
   PixelBuffer.io.v_pos := v_cntReg
 
   io.mem_addr := PixelBuffer.io.mem_addr
-  io.read := PixelBuffer.io.read
+  io.mem_read := PixelBuffer.io.mem_read
+  PixelBuffer.io.mem_valid := io.mem_valid
   PixelBuffer.io.mem_data := io.mem_data
 
   io.R := PixelBuffer.io.R

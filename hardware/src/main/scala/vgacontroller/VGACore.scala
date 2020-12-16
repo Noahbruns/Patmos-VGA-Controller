@@ -47,7 +47,14 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   io.G := controller.io.G
   io.B := controller.io.B
 
-  //controller.io.mem_addr := io.memPort.Addr
-  //controller.io.read := io.memPort
-  //controller.io.mem_data := io.memPort
+  // Connect to Memory
+  controller.io.mem_data := io.memPort.M.Data
+  controller.io.mem_valid := io.memPort.M.DataValid
+  io.memPort.M.DataByteEn := !(0.U) //enable all Bytes Output
+  io.memPort.M.Addr := controller.io.mem_addr
+
+  io.memPort.M.Cmd := OcpCmd.IDLE
+  when(controller.io.mem_read) {
+    io.memPort.M.Cmd := OcpCmd.RD
+  }
 }

@@ -38,7 +38,8 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
     val v_pos = Input(UInt(log2Ceil(display_height).W))
 
     val mem_addr = Output(UInt(extmem_addr_width.W))
-    val read = Output(Bool())
+    val mem_read = Output(Bool())
+    val mem_valid = Input(Bool())
     val mem_data = Input(UInt(data_width.W))
   })
 
@@ -46,7 +47,7 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
 
   // Read from Memory
   io.mem_addr  := 0.U
-  io.read      := false.B
+  io.mem_read  := false.B
 
   // Write Out
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories
