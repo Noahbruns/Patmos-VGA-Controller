@@ -169,6 +169,12 @@ class PatmosCore(binFile: String, nr: Int, cnt: Int) extends Module {
   //debug(enableReg) does nothing in chisel3 (no proning in frontend of chisel3 anyway)
 }
 
+class VGACore(nr: Int) extends Module {
+  val io = IO(new Bundle() {
+    val memPort = new OcpBurstMasterPort(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)
+  })
+}
+
 trait HasPins {
   val pins : Bundle
 }
@@ -430,27 +436,29 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
 
   registerPins(ramConf.name, ramCtrl.io)
 
+  //Create VGA Module
+  val vga = Module(new VGACore(nrCores)) // append as last
+
   // TODO: fix memory arbiter to have configurable memory timing.
   // E.g., it does not work with on-chip main memory.
-  if (cores.length == 1) {
-    ramCtrl.io.ocp.M <> cores(0).io.memPort.M
-    cores(0).io.memPort.S <> ramCtrl.io.ocp.S
-    ramCtrl.io.superMode <> cores(0).io.superMode
-  } else {
-    val memarbiter =
-      if(ramCtrl.isInstanceOf[DDR3Bridge]) {
-        Module(new ocp.Arbiter(nrCores, ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH))
-      } else {
-        Module(new ocp.TdmArbiterWrapper(nrCores, ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH))
-      }
-    for (i <- (0 until cores.length)) {
-      memarbiter.io.master(i).M <> cores(i).io.memPort.M
-      cores(i).io.memPort.S <> memarbiter.io.master(i).S
+  val memarbiter =
+    if(ramCtrl.isInstanceOf[DDR3Bridge]) {
+      Module(new ocp.Arbiter(nrCores + 1, ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH))
+    } else {
+      Module(new ocp.TdmArbiterWrapper(nrCores + 1, ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH))
     }
-    ramCtrl.io.ocp.M <> memarbiter.io.slave.M
-    memarbiter.io.slave.S <> ramCtrl.io.ocp.S
-    ramCtrl.io.superMode := false.B
+  for (i <- (0 until cores.length)) {
+    memarbiter.io.master(i).M <> cores(i).io.memPort.M
+    cores(i).io.memPort.S <> memarbiter.io.master(i).S
   }
+
+  //Connect VGA Controller
+  memarbiter.io.master(nrCores).M <> vga.io.memPort.M
+  vga.io.memPort.S <> memarbiter.io.master(nrCores).S
+
+  ramCtrl.io.ocp.M <> memarbiter.io.slave.M
+  memarbiter.io.slave.S <> ramCtrl.io.ocp.S
+  ramCtrl.io.superMode := false.B
 
   override val io = IO(new PatmosBundle(pins.map{case (pinid, devicepin) => pinid -> DataMirror.internal.chiselTypeClone(devicepin)}.toSeq: _*))
 
