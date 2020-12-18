@@ -261,5 +261,5 @@ VGACore-test:
 	$(SBT) "test:runMain simple.VGACoreTest"
 
 VGACore-view: VGACore-test
-	gtkwave generated/simple.VGACoreTest/VGA.vcd --save=VGA.gtkw
+	gtkwave generated/simple.VGACoreTest1879218436/VGACore.vcd --save=VGA.gtkw
 

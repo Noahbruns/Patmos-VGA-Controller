@@ -10,11 +10,11 @@ class LineMemory(line_width: Int) extends Module {
   val size = line_width * 2
 
   val io = IO(new Bundle {
-    val rdAddr = Input(UInt(log2Ceil(size).W)) 
+    val rdAddr = Input(UInt(log2Ceil(size + 1).W)) 
     val rdData = Output(UInt(16.W)) 
     val wrEna = Input(Bool())
     val wrData = Input(UInt(16.W)) 
-    val wrAddr = Input(UInt(log2Ceil(size).W))
+    val wrAddr = Input(UInt(log2Ceil(size + 1).W))
   })
 
   val mem = SyncReadMem(size, UInt(16.W))
@@ -34,8 +34,8 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
     val R = Output(UInt(8.W))
     val G = Output(UInt(8.W))
     val B = Output(UInt(8.W))
-    val h_pos = Input(UInt(log2Ceil(line_width).W))
-    val v_pos = Input(UInt(log2Ceil(display_height).W))
+    val h_pos = Input(UInt(log2Ceil(line_width + 1).W))
+    val v_pos = Input(UInt(log2Ceil(display_height + 1).W))
 
     val mem_addr = Output(UInt(extmem_addr_width.W))
     val mem_read = Output(Bool())
@@ -51,14 +51,16 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
 
   val v_pos_next = RegInit(0.U(log2Ceil(display_height).W))
   v_pos_next := io.v_pos + 1.U
-  lineAddress := lineAddress + 1.U
-
+  
+  /*when(h_pos === /*Am ende*/){
+    v_pos_next := v_pos + 1
+  }*/
   val base_address = 0.U
   
   //Requesting data from SRAM 
-      recvBuf      := io.mem_data  //Getting two pixels at once
-      io.mem_addr  := base_address     //FIXME: Requesting the correct address
-      io.mem_read      := true.B
+  recvBuf      := io.mem_data  //Getting two pixels at once
+  io.mem_addr  := base_address     //FIXME: Requesting the correct address
+  io.mem_read      := true.B
 
   memory.io.wrEna := true.B
   memory.io.wrAddr := lineAddress //Line 1
@@ -77,7 +79,7 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
   // Write to line memory
   when(v_pos_next(0) === 0.B) { // Switch between Dual Memories
       //Write to Line 1
-      memory.io.wrAddr := 400.U + lineAddress //Line 1
+      memory.io.wrAddr := 400.U(10.W) + lineAddress //Line 1
     }.otherwise{
       //Write to Line 0
       memory.io.wrAddr := lineAddress //Line 0

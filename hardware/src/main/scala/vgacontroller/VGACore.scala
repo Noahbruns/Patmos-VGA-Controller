@@ -52,7 +52,8 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   io.memPort.M.DataValid := false.B
 
   controller.io.mem_data := io.memPort.S.Data
-  controller.io.mem_valid := io.memPort.S.DataAccept
+  //controller.io.mem_valid := io.memPort.S.DataAccept
+  controller.io.mem_valid := true.B //FIXME: Value True for debugging
 
   io.memPort.M.DataByteEn := !(0.U) //enable all Bytes Output
   io.memPort.M.Addr := controller.io.mem_addr
