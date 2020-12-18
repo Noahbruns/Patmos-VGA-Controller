@@ -14,7 +14,7 @@ class VGACoreTester(dut: VGACore) extends PeekPokeTester(dut) {
 
 
 object VGACoreTest extends App {
-  iotesters.Driver.execute(Array("--target-dir", "generated", "--generate-vcd-output", "on"), () => new VGACore()) {
+  iotesters.Driver.execute(Array("--target-dir", "generated", "--generate-vcd-output", "on"), () => new VGACore(32, 32, 10)) {
     c => new VGACoreTester(c)
   }
 }
