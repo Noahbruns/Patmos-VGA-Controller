@@ -11,7 +11,7 @@ COM_PORT?=/dev/ttyUSB0
 BOOTAPP?=bootable-bootloader
 
 # Application to be downloaded
-APP?=hello_puts
+APP?=VGAExample
 
 # Altera FPGA configuration cables
 #BLASTER_TYPE=ByteBlasterMV
