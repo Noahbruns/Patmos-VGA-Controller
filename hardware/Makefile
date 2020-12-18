@@ -13,6 +13,8 @@ BOOTSPM_BASE?=0x00020000
 
 HWMODULEPREFIX?=
 
+export _JAVA_OPTIONS="-Xmx8g"
+
 #SBT=java -Xmx1024M -Xss8M -jar sbt/sbt-launch.jar
 SBT= sbt
 
@@ -250,4 +252,14 @@ twowayboard:
 
 twowayboard_test:
 	$(SBT) "test:runMain twoway.TwoWayBoardTester"
+
+# Generate Verilog code
+VGACore:
+	$(SBT) "runMain VGACore.VGACore"
+
+VGACore-test:
+	$(SBT) "test:runMain simple.VGACoreTest"
+
+VGACore-view: VGACore-test
+	gtkwave generated/simple.VGACoreTest/VGA.vcd --save=VGA.gtkw
 

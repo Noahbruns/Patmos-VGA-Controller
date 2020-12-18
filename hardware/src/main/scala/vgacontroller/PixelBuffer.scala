@@ -45,9 +45,43 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
 
   val memory = Module(new LineMemory(line_width))
 
-  // Read from Memory
-  io.mem_addr  := 0.U
-  io.mem_read  := false.B
+  val recvBuf = RegInit(0.U(data_width.W))
+
+  val lineAddress = RegInit(0.U(log2Ceil(400).W))
+
+  val v_pos_next = RegInit(0.U(log2Ceil(display_height).W))
+  v_pos_next := io.v_pos + 1.U
+  lineAddress := lineAddress + 1.U
+
+  val base_address = 0.U
+  
+  //Requesting data from SRAM 
+      recvBuf      := io.mem_data  //Getting two pixels at once
+      io.mem_addr  := base_address     //FIXME: Requesting the correct address
+      io.mem_read      := true.B
+
+  memory.io.wrEna := true.B
+  memory.io.wrAddr := lineAddress //Line 1
+  memory.io.wrData := recvBuf
+
+  //Increment lineAddress, if data is valid and lineAddress smaller than 400
+  when(io.mem_valid === true.B && lineAddress < 400.U){
+    lineAddress := lineAddress + 1.U
+  }
+
+  //Reset lineAddress if v_pos toggles
+  when(io.h_pos === 0.U){
+    lineAddress := 0.U
+  }
+
+  // Write to line memory
+  when(v_pos_next(0) === 0.B) { // Switch between Dual Memories
+      //Write to Line 1
+      memory.io.wrAddr := 400.U + lineAddress //Line 1
+    }.otherwise{
+      //Write to Line 0
+      memory.io.wrAddr := lineAddress //Line 0
+    }
 
   // Write Out
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories

@@ -48,7 +48,7 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   io.B := controller.io.B
 
   // Connect to Memory
-  controller.io.mem_data := io.memPort.M.Data
+  controller.io.mem_data <> io.memPort.M.Data
   controller.io.mem_valid := io.memPort.M.DataValid
   io.memPort.M.DataByteEn := !(0.U) //enable all Bytes Output
   io.memPort.M.Addr := controller.io.mem_addr
@@ -57,4 +57,10 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   when(controller.io.mem_read) {
     io.memPort.M.Cmd := OcpCmd.RD
   }
+}
+/**
+ * An object extending App to generate the Verilog code.
+ */
+object VGACore extends App {
+  chisel3.Driver.execute(Array[String](), () => new VGACore(32, 32, 10))
 }
