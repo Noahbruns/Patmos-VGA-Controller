@@ -25,7 +25,7 @@ class LineMemory(line_width: Int) extends Module {
   }
 }
 
-class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, data_width: Int) extends Module {
+class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, data_width: Int, burst_length: Int) extends Module {
   val io = IO(new Bundle {
     val new_frame = Input(UInt(1.W))
 
@@ -37,10 +37,7 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
     val h_pos = Input(UInt(log2Ceil(line_width).W))
     val v_pos = Input(UInt(log2Ceil(display_height).W))
 
-    val mem_addr = Output(UInt(extmem_addr_width.W))
-    val mem_read = Output(Bool())
-    val mem_valid = Input(Bool())
-    val mem_data = Input(UInt(data_width.W))
+    val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
   })
 
   val memory = Module(new LineMemory(line_width))
@@ -54,11 +51,18 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
   lineAddress := lineAddress + 1.U
 
   val base_address = 0.U
+
+  io.memPort.M.Cmd := OcpCmd.RD
+  io.memPort.M.Data := 0.U
+  io.memPort.M.DataByteEn := 0.U
+  io.memPort.M.DataValid := false.B
   
+  /* Read data from RAM */
+  /*
   //Requesting data from SRAM 
-      recvBuf      := io.mem_data  //Getting two pixels at once
-      io.mem_addr  := base_address     //FIXME: Requesting the correct address
-      io.mem_read      := true.B
+  recvBuf      := io.mem_data  //Getting two pixels at once
+  io.mem_addr  := base_address     //FIXME: Requesting the correct address
+  io.mem_read      := true.B
 
   memory.io.wrEna := true.B
   memory.io.wrAddr := lineAddress //Line 1
@@ -76,14 +80,15 @@ class PixelBuffer(line_width: Int, display_height: Int, extmem_addr_width: Int, 
 
   // Write to line memory
   when(v_pos_next(0) === 0.B) { // Switch between Dual Memories
-      //Write to Line 1
-      memory.io.wrAddr := 400.U + lineAddress //Line 1
-    }.otherwise{
-      //Write to Line 0
-      memory.io.wrAddr := lineAddress //Line 0
-    }
+    //Write to Line 1
+    memory.io.wrAddr := 400.U + lineAddress //Line 1
+  }.otherwise{
+    //Write to Line 0
+    memory.io.wrAddr := lineAddress //Line 0
+  }
+  */
 
-  // Write Out
+  /* Write Out */
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories
     when(io.enable === 1.U) {
       memory.io.rdAddr := io.h_pos

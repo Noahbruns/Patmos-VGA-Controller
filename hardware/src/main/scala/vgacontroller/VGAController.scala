@@ -7,7 +7,7 @@ import ocp.{OcpCoreSlavePort, _}
 
 import PixelBuffer._
 
-class VGAController(extmem_addr_width: Int, data_width: Int) extends Module {
+class VGAController(extmem_addr_width: Int, data_width: Int, burst_length: Int) extends Module {
   val io = IO(new Bundle {
     val n_blank = Output(UInt(1.W))
     val h_sync = Output(UInt(1.W))
@@ -19,10 +19,7 @@ class VGAController(extmem_addr_width: Int, data_width: Int) extends Module {
     val G = Output(UInt(8.W))
     val B = Output(UInt(8.W))
 
-    val mem_addr = Output(UInt(extmem_addr_width.W))
-    val mem_read = Output(Bool())
-    val mem_valid = Input(Bool())
-    val mem_data = Input(UInt(data_width.W))
+    val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
   })
 
   /* Devide clock to generate Pixel clock */
@@ -58,7 +55,7 @@ class VGAController(extmem_addr_width: Int, data_width: Int) extends Module {
   val h_cntReg = RegInit(0.U(log2Ceil(frame_width).W))
 
   /* Generate Pixel buffer */
-  val PixelBuffer = Module(new PixelBuffer(h_display, v_display, extmem_addr_width, data_width))
+  val PixelBuffer = Module(new PixelBuffer(h_display, v_display, extmem_addr_width, data_width, burst_length))
   
   PixelBuffer.io.new_frame := io.new_frame // Add synchronizer
   PixelBuffer.io.enable := io.n_blank
@@ -66,10 +63,7 @@ class VGAController(extmem_addr_width: Int, data_width: Int) extends Module {
   PixelBuffer.io.h_pos := h_cntReg
   PixelBuffer.io.v_pos := v_cntReg
 
-  io.mem_addr := PixelBuffer.io.mem_addr
-  io.mem_read := PixelBuffer.io.mem_read
-  PixelBuffer.io.mem_valid := io.mem_valid
-  PixelBuffer.io.mem_data := io.mem_data
+  io.memPort <> PixelBuffer.io.memPort
 
   io.R := PixelBuffer.io.R
   io.G := PixelBuffer.io.G

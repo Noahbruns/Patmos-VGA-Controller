@@ -36,7 +36,7 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
 
   io.n_sync := 0.U // Pulled to 0 because sync using green channel not use
 
-  val controller = Module(new VGAController(extmem_addr_width, data_width))
+  val controller = Module(new VGAController(extmem_addr_width, data_width, burst_length))
 
   io.pixel_clock := controller.io.pixel_clock
   io.n_blank := controller.io.n_blank
@@ -48,19 +48,7 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   io.B := controller.io.B
 
   // Connect to Memory
-  io.memPort.M.Data := 0.U
-  io.memPort.M.DataValid := false.B
-
-  controller.io.mem_data := io.memPort.S.Data
-  controller.io.mem_valid := io.memPort.S.DataAccept
-
-  io.memPort.M.DataByteEn := !(0.U) //enable all Bytes Output
-  io.memPort.M.Addr := controller.io.mem_addr
-
-  io.memPort.M.Cmd := OcpCmd.IDLE
-  when(controller.io.mem_read) {
-    io.memPort.M.Cmd := OcpCmd.RD
-  }
+  io.memPort <> controller.io.memPort
 }
 /**
  * An object extending App to generate the Verilog code.
