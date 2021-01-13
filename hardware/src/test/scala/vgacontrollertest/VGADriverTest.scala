@@ -14,20 +14,21 @@ class VGACoreTestBench() extends Module {
   val core = Module(new VGACore(32, 32, 4)) 
 
   val count = RegInit(0.U(6.W))
+
   core.io.memPort.S.CmdAccept := false.B
   core.io.memPort.S.DataAccept := false.B
   core.io.memPort.S.Resp := OcpResp.NULL
 
+  when(count > 0.U) {
+    count := count - 1.U
+  }
+
   when(core.io.memPort.M.Cmd === OcpCmd.RD) {
-    count := 0.U
+    count := 4.U
     core.io.memPort.S.CmdAccept := true.B
   }
 
-  core.io.memPort.S.Data := count
-
-  when(count <= 5.U) {
-    count := count + 1.U
-  }
+  core.io.memPort.S.Data := "hFFFF0000".U
 
   when(count > 0.U && count < 5.U) {
     core.io.memPort.S.Resp := OcpResp.DVA
