@@ -1,11 +1,3 @@
-// Chisel highlighting
-
-/*
- * This code is a minimal hardware described in Chisel.
- *
- * Blinking LED: the FPGA version of Hello World
- */
-
 package VGACore
 
 import chisel3._
@@ -13,10 +5,6 @@ import chisel3._
 import ocp.{OcpCoreSlavePort, _}
 
 import VGAController._
-
-/*
- * The blinking LED component.
- */
 
 class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extends Module {
   val io = IO(new Bundle {
