@@ -40,7 +40,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
   })
 
-  val base_address = 0.U
+  val base_address = 800000.U
 
   val memory = Module(new LineMemory(line_width, 32))
 

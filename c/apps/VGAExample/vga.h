@@ -15,7 +15,7 @@ typedef struct {
     uint8_t B;
 } color;
 
-volatile uint16_t (*base)[VGA_DISPLAY_WIDTH][VGA_DISPLAY_HEIGHT] = 0x0; //FIXME
+volatile uint16_t (*base)[VGA_DISPLAY_WIDTH][VGA_DISPLAY_HEIGHT] = 800000; //FIXME
 
 void writePixel(uint16_t x, uint16_t y, color c) {
     uint16_t temp = 0;
