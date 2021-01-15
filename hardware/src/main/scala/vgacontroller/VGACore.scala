@@ -8,14 +8,11 @@ import chisel3._
 import ocp.{OcpCoreSlavePort, _}
 
 import VGAController._
+import java.util.ResourceBundle
 
-class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extends CoreDevice() {
-  /*val io = IO(new Bundle {
-    val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
-  })*/
-  
-  override val io = IO(new CoreDeviceIO() with patmos.HasPins {
-    override val pins = new Bundle() {
+class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extends Module {
+  val io = IO(new Bundle() with patmos.HasPins {
+    val pins = new Bundle() {
       val pixel_clock = Output(UInt(1.W))
       val n_sync = Output(UInt(1.W))
       val n_blank = Output(UInt(1.W))

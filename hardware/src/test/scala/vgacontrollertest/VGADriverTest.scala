@@ -2,7 +2,7 @@ package simple
 
 import chisel3._
 import chisel3.iotesters.PeekPokeTester
-import VGACore._
+import io.VGACore
 
 import ocp.{OcpCoreSlavePort, _}
 

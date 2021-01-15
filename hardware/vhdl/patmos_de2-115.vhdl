@@ -136,6 +136,8 @@ begin
            oLedsPins_led,
            iKeysPins_key,
            oUartPins_txd, iUartPins_rxd,
-           oSRAM_A, sram_out_dout_ena, SRAM_DQ, sram_out_dout, oSRAM_CE_N, oSRAM_OE_N, oSRAM_WE_N, oSRAM_LB_N, oSRAM_UB_N);
+           oSRAM_A, sram_out_dout_ena, SRAM_DQ, sram_out_dout, oSRAM_CE_N, oSRAM_OE_N, oSRAM_WE_N, oSRAM_LB_N, oSRAM_UB_N,
+           pixel_clock, n_sync, n_blank, h_sync, v_sync, R, G, B
+          );
 
 end architecture rtl;
