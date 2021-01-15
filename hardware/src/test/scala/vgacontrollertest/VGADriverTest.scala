@@ -18,6 +18,7 @@ class VGACoreTestBench() extends Module {
   core.io.memPort.S.CmdAccept := false.B
   core.io.memPort.S.DataAccept := false.B
   core.io.memPort.S.Resp := OcpResp.NULL
+  core.io.blank := false.B
 
   when(count > 0.U) {
     count := count - 1.U
@@ -39,7 +40,7 @@ class VGACoreTestBench() extends Module {
  * Test the VGACore design
  */
 class VGACoreTester(dut: VGACoreTestBench) extends PeekPokeTester(dut) {
-  step(200000)
+  step(2000000)
 }
 
 

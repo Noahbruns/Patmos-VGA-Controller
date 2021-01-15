@@ -15,7 +15,7 @@ typedef struct {
     uint8_t B;
 } color;
 
-volatile uint16_t (*base)[VGA_DISPLAY_WIDTH][VGA_DISPLAY_HEIGHT] = 800000; //FIXME
+volatile uint16_t (*base)[VGA_DISPLAY_HEIGHT][VGA_DISPLAY_WIDTH] = 800000; //FIXME
 
 void writePixel(uint16_t x, uint16_t y, color c) {
     uint16_t temp = 0;
@@ -23,7 +23,7 @@ void writePixel(uint16_t x, uint16_t y, color c) {
     temp |= (c.G >> 3) << 5;
     temp |= (c.B >> 3);
 
-    (*base)[x][y] = temp;
+    (*base)[y][x] = temp;
 }
 
 #define VGALib

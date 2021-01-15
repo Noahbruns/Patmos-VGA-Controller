@@ -7,14 +7,14 @@ import chisel3.util._
 import chisel3.util.experimental.loadMemoryFromFile
 
 class LineMemory(line_width: Int, bits: Int) extends Module {
-  val size = line_width * 2
+  val size = 1024
 
   val io = IO(new Bundle {
-    val rdAddr = Input(UInt(log2Ceil(size + 1).W)) 
+    val rdAddr = Input(UInt(log2Ceil(size).W)) 
     val rdData = Output(UInt(bits.W)) 
     val wrEna = Input(Bool())
     val wrData = Input(UInt(bits.W)) 
-    val wrAddr = Input(UInt(log2Ceil(size + 1).W))
+    val wrAddr = Input(UInt(log2Ceil(size).W))
   })
 
   val mem = SyncReadMem(size, UInt(bits.W))
@@ -41,7 +41,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     val blank = Input(Bool())
   })
 
-  val base_address = 800000.U
+  val base_address = 800000.U(32.W)
 
   val memory = Module(new LineMemory(line_width, 32))
 
@@ -49,7 +49,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   val bytes_per_pixel = 2                      // number bytes in each pixel
   val pixel_per_word  = 2                      // number bytes in each pixel
 
-  val lineAddress = RegInit(0.U(log2Ceil(line_width / pixel_per_word).W))     //counts the requested Bursts
+  val wordAddress = RegInit(0.U(log2Ceil(line_width / pixel_per_word).W))     //counts the requested Bursts
   val burst_counter = RegInit(0.U(log2Ceil(burst_length).W))   //counts the recieved
   object States {
     val Idle      = "b00".U(2.W)
@@ -58,7 +58,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   }
   val State = RegInit(0.U(2.W))
 
-  val read_v_pos = ((io.v_pos | 0.U(32.W)) + 1.U) % frame_height.U           // Next Line to read
+  val read_v_pos = (io.v_pos + 1.U) % frame_height.U           // Next Line to read
 
   io.memPort.M.Cmd := OcpCmd.IDLE
   io.memPort.M.Addr := 0.U
@@ -71,13 +71,13 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   memory.io.wrData := 0.U
 
   when(io.h_pos === 0.U && read_v_pos <= display_height.U) {
-    lineAddress := 0.U
+    wordAddress := 0.U
     State := States.Request
   }
 
-  //Increment lineAddress, if data is valid and lineAddress smaller than line_width
+  //Increment wordAddress, if data is valid and wordAddress smaller than line_width
   when(State === States.Request){
-    io.memPort.M.Addr := base_address + (read_v_pos * line_width.U * bytes_per_pixel.U) + lineAddress * bytes_per_word.U
+    io.memPort.M.Addr := base_address + (read_v_pos * line_width.U * bytes_per_pixel.U) + wordAddress * bytes_per_word.U
     io.memPort.M.Cmd := OcpCmd.RD
 
     when(io.memPort.S.CmdAccept === true.B) {
@@ -86,14 +86,14 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   }
   .elsewhen(State === States.Process && io.memPort.S.Resp === OcpResp.DVA){
     memory.io.wrEna  := true.B
-    memory.io.wrAddr := (read_v_pos * line_width.U) + lineAddress
+    memory.io.wrAddr := (read_v_pos(0) * (line_width.U >> 1)) + Cat(0.U(2.W), wordAddress)
     memory.io.wrData := io.memPort.S.Data
 
-    lineAddress := lineAddress + 1.U
+    wordAddress := wordAddress + 1.U
     burst_counter := burst_counter + 1.U
 
     when (burst_counter === (burst_length - 1).U) {
-      when (lineAddress * pixel_per_word.U < line_width.U) {
+      when (wordAddress + 1.U < (line_width.U >> 1)) {// This word can still be written
         State := States.Request
       }
       .otherwise {
@@ -102,7 +102,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     }
   }
 
-  when(io.blank) {
+  when(io.blank === true.B) {
     State := States.Idle
   }
 
@@ -111,11 +111,11 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     when(io.enable === 1.U) {
       memory.io.rdAddr := io.h_pos >> 1
     }.otherwise {
-      memory.io.rdAddr := line_width.U // Prepare for next line
+      memory.io.rdAddr := line_width.U >> 1 // Prepare for next line
     }
   }.otherwise{
     when(io.enable === 1.U) {
-      memory.io.rdAddr := Cat(0.U(1.W), io.h_pos >> 1) + line_width.U // Best approach???
+      memory.io.rdAddr := (Cat(0.U(1.W), io.h_pos) + line_width.U) >> 1 // Best approach???
     }.otherwise {
       memory.io.rdAddr := 0.U // Prepare for next line
     }
@@ -126,7 +126,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   io.G := 0.U
   io.B := 0.U
   when(io.enable === 1.U) {
-    when(io.blank) {
+    when(io.blank === true.B) {
       io.R := 40.U
       io.G := 40.U
       io.B := 40.U
