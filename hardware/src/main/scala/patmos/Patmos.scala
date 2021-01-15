@@ -460,7 +460,7 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
 
   if (cores.length == 1) {
     ramCtrl.io.superMode <> cores(0).io.superMode
-    vga.io.blank := ramCtrl.io.superMode
+    vga.io.blank := false.B //ramCtrl.io.superMode
   }
   else {
     ramCtrl.io.superMode := false.B
