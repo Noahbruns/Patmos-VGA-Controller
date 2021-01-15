@@ -433,9 +433,9 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
   registerPins(ramConf.name, ramCtrl.io)
 
   //Create VGA Module
-  val vga = Module(new VGACore(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)) // append as last
+  //val vga = Module(new VGACore(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)) // append as last
 
-  registerPins("VGA", vga.io)
+  //registerPins("VGA", vga.io)
 
   // TODO: fix memory arbiter to have configurable memory timing.
   // E.g., it does not work with on-chip main memory.
@@ -451,8 +451,8 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
   }
 
   //Connect VGA Controller
-  memarbiter.io.master(nrCores).M <> vga.io.memPort.M
-  vga.io.memPort.S <> memarbiter.io.master(nrCores).S
+  //memarbiter.io.master(nrCores).M <> vga.io.memPort.M
+  //vga.io.memPort.S <> memarbiter.io.master(nrCores).S
 
   ramCtrl.io.ocp.M <> memarbiter.io.slave.M
   memarbiter.io.slave.S <> ramCtrl.io.ocp.S
