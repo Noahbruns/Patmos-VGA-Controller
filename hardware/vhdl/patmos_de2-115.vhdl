@@ -28,6 +28,15 @@ entity patmos_top is
     oSRAM_WE_N : out std_logic;
     oSRAM_LB_N : out std_logic;
     oSRAM_UB_N : out std_logic
+
+    pixel_clock : out std_logic;
+    n_sync : out std_logic;
+    n_blank : out std_logic;
+    h_sync : out std_logic;
+    v_sync : out std_logic;
+    R : out std_logic_vector(7 downto 0);
+    G : out std_logic_vector(7 downto 0);
+    B : out std_logic_vector(7 downto 0);
   );
 end entity patmos_top;
 
@@ -52,6 +61,14 @@ architecture rtl of patmos_top is
       io_SramCtrl_ramOut_nlb : out std_logic;
       io_SramCtrl_ramOut_nub : out std_logic
 
+      io_VGA_pixel_clock : out std_logic;
+      io_VGA_n_sync : out std_logic;
+      io_VGA_n_blank : out std_logic;
+      io_VGA_h_sync : out std_logic;
+      io_VGA_v_sync : out std_logic;
+      io_VGA_R : out std_logic_vector(7 downto 0);
+      io_VGA_G : out std_logic_vector(7 downto 0);
+      io_VGA_B : out std_logic_vector(7 downto 0);
     );
   end component;
 

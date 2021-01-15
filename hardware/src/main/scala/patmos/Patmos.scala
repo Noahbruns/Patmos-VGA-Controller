@@ -435,6 +435,8 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
   //Create VGA Module
   val vga = Module(new VGACore(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)) // append as last
 
+  registerPins("VGA", vga.io)
+
   // TODO: fix memory arbiter to have configurable memory timing.
   // E.g., it does not work with on-chip main memory.
   val memarbiter =

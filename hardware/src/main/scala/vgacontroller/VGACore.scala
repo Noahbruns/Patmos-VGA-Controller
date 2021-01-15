@@ -38,9 +38,3 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
   // Connect to Memory
   io.memPort <> controller.io.memPort
 }
-/**
- * An object extending App to generate the Verilog code.
- */
-object VGACore extends App {
-  chisel3.Driver.execute(Array[String](), () => new VGACore(32, 32, 10))
-}
