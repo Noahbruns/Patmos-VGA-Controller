@@ -117,10 +117,10 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   }
   val rdData = memory.io.rdData
 
-  io.R := 255.U
-  io.G := 255.U
-  io.B := 255.U
-  /*when(io.enable === 1.U) {
+  io.R := 0.U
+  io.G := 0.U
+  io.B := 0.U
+  when(io.enable === 1.U) {
     when(io.h_pos(0) === 1.U) {
       io.R := rdData(14, 10) << 3
       io.G := rdData(9, 5) << 3
@@ -130,5 +130,5 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
       io.G := rdData(25, 21) << 3
       io.B := rdData(20, 16) << 3
     }
-  }*/
+  }
 }
