@@ -25,6 +25,7 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
       val B = Output(UInt(8.W))
     }
     val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
+    val blank = Input(Bool())
   })
 
   io.pins.n_sync := 0.U // Pulled to 0 because sync using green channel not use
@@ -42,4 +43,5 @@ class VGACore(extmem_addr_width: Int, data_width: Int, burst_length: Int) extend
 
   // Connect to Memory
   io.memPort <> controller.io.memPort
+  controller.io.blank := io.blank
 }

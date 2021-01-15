@@ -38,6 +38,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     val v_pos = Input(UInt(log2Ceil(frame_height).W))
 
     val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
+    val blank = Input(Bool())
   })
 
   val base_address = 800000.U
@@ -101,6 +102,10 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     }
   }
 
+  when(io.blank) {
+    State := States.Idle
+  }
+
   /* Write Out */
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories
     when(io.enable === 1.U) {
@@ -121,7 +126,12 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   io.G := 0.U
   io.B := 0.U
   when(io.enable === 1.U) {
-    when(io.h_pos(0) === 1.U) {
+    when(io.blank) {
+      io.R := 40.U
+      io.G := 40.U
+      io.B := 40.U
+    }
+    .elsewhen(io.h_pos(0) === 1.U) {
       io.R := rdData(14, 10) << 3
       io.G := rdData(9, 5) << 3
       io.B := rdData(4, 0) << 3

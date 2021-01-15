@@ -433,9 +433,9 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
   registerPins(ramConf.name, ramCtrl.io)
 
   //Create VGA Module
-  //val vga = Module(new VGACore(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)) // append as last
+  val vga = Module(new VGACore(EXTMEM_ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH)) // append as last
 
-  //registerPins("VGA", vga.io)
+  registerPins("VGA", vga.io)
 
   // TODO: fix memory arbiter to have configurable memory timing.
   // E.g., it does not work with on-chip main memory.
@@ -445,18 +445,26 @@ class Patmos(configFile: String, binFile: String, datFile: String) extends Modul
     } else {
       Module(new ocp.TdmArbiterWrapper(nrCores + 1, ADDR_WIDTH, DATA_WIDTH, BURST_LENGTH))
     }
+
   for (i <- (0 until cores.length)) {
     memarbiter.io.master(i).M <> cores(i).io.memPort.M
     cores(i).io.memPort.S <> memarbiter.io.master(i).S
   }
 
   //Connect VGA Controller
-  //memarbiter.io.master(nrCores).M <> vga.io.memPort.M
-  //vga.io.memPort.S <> memarbiter.io.master(nrCores).S
+  memarbiter.io.master(nrCores).M <> vga.io.memPort.M
+  vga.io.memPort.S <> memarbiter.io.master(nrCores).S
 
   ramCtrl.io.ocp.M <> memarbiter.io.slave.M
   memarbiter.io.slave.S <> ramCtrl.io.ocp.S
-  ramCtrl.io.superMode := false.B
+
+  if (cores.length == 1) {
+    ramCtrl.io.superMode <> cores(0).io.superMode
+    vga.io.blank := ramCtrl.io.superMode
+  }
+  else {
+    ramCtrl.io.superMode := false.B
+  }
 
   override val io = IO(new PatmosBundle(pins.map{case (pinid, devicepin) => pinid -> DataMirror.internal.chiselTypeClone(devicepin)}.toSeq: _*))
 

@@ -20,6 +20,7 @@ class VGAController(extmem_addr_width: Int, data_width: Int, burst_length: Int) 
     val B = Output(UInt(8.W))
 
     val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burst_length)
+    val blank = Input(Bool())
   })
 
   /* Devide clock to generate Pixel clock */
@@ -62,6 +63,7 @@ class VGAController(extmem_addr_width: Int, data_width: Int, burst_length: Int) 
   PixelBuffer.io.pixel_clock := pixel_clock
   PixelBuffer.io.h_pos := h_cntReg
   PixelBuffer.io.v_pos := v_cntReg
+  PixelBuffer.io.blank := io.blank
 
   io.memPort <> PixelBuffer.io.memPort
 
