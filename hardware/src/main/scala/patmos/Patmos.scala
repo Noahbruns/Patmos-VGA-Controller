@@ -19,7 +19,7 @@ import datacache._
 import ocp.{OcpCoreSlavePort, _}
 import argo._
 
-import VGACore._
+//import VGACore._
 
 import scala.collection.immutable.Stream.Empty
 import scala.collection.mutable
