@@ -58,7 +58,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   }
   val State = RegInit(0.U(2.W))
 
-  val read_v_pos = (io.v_pos.U(32.W) + 1.U) % frame_height.U           // Next Line to read
+  val read_v_pos = ((io.v_pos | 0.U(32.W)) + 1.U) % frame_height.U           // Next Line to read
 
   io.memPort.M.Cmd := OcpCmd.IDLE
   io.memPort.M.Addr := 0.U
