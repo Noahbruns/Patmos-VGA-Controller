@@ -13,19 +13,22 @@ class VGACoreTestBench() extends Module {
 
   val core = Module(new VGACore(32, 32, 4)) 
 
-  val count = RegInit(0.U(6.W))
+  val count = RegInit(0.U(10.W))
 
   core.io.memPort.S.CmdAccept := false.B
   core.io.memPort.S.DataAccept := false.B
   core.io.memPort.S.Resp := OcpResp.NULL
   core.io.blank := false.B
 
+  when(core.io.memPort.M.Cmd === OcpCmd.RD) {
+    count := 8.U
+  }
+
   when(count > 0.U) {
     count := count - 1.U
   }
 
-  when(core.io.memPort.M.Cmd === OcpCmd.RD) {
-    count := 4.U
+  when(count === 5.U) {
     core.io.memPort.S.CmdAccept := true.B
   }
 
@@ -40,7 +43,7 @@ class VGACoreTestBench() extends Module {
  * Test the VGACore design
  */
 class VGACoreTester(dut: VGACoreTestBench) extends PeekPokeTester(dut) {
-  step(2000000)
+  step(20000)
 }
 
 
