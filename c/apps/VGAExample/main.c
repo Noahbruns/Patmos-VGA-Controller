@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "vga.h"
+#include <math.h>
 
 #include <machine/patmos.h>
 #include <machine/exceptions.h>
@@ -108,6 +109,16 @@ void runPacman(int X, int Y, int toX, int toY) {
   }
 }
 
+void renderPackageFound(int x, int y, color c){
+  int radius = 20;
+  for(float i = 0; i < 2*3.14; i+=0.1){
+    int x_tmp = radius*16*pow(sin(i),3);
+    int y_tmp = -radius*(13*cos(i) - 5*cos(2*i) -2*cos(3*i) - cos(4*i));
+    writePixel(x + x_tmp, y + y_tmp, c);
+  }
+
+}
+
 //Prints a cross representing the packages
 void renderPackage(int x, int y, color c) {
   int sizeX = 10;
@@ -141,7 +152,7 @@ void pacman() {
     renderPackage(xrand, yrand, magenta);
 
     runPacman(x,y, xrand, yrand);
-    renderPackage(xrand, yrand, black);
+    renderPackageFound(xrand, yrand, red);
     x = xrand;
     y = yrand;
   }
