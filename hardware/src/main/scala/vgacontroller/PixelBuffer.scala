@@ -127,17 +127,23 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   io.G := 0.U
   io.B := 0.U
   when(io.enable === 1.U) {
-    var addr  = io.h_pos(2, 0)
-    var value = rdData(addr, addr + 3)
-    
-    when(io.h_pos(0) === 1.U) {
-      io.R := rdData(14, 10) << 3
-      io.G := rdData(9, 5) << 3
-      io.B := rdData(4, 0) << 3
-    }.otherwise {
-      io.R := rdData(30, 26) << 3
-      io.G := rdData(25, 21) << 3
-      io.B := rdData(20, 16) << 3
+    val addr = io.h_pos(1,0)
+    val value = rdData(4.U*addr, 4.U*addr+3.U)
+
+    when(value(0) === 1.B){
+      io.R := 255.U
+    }.otherwise{
+      io.R := 0.U
+    }
+    when(value(1) === 1.B){
+      io.G := 255.U
+    }.otherwise{
+      io.G := 0.U
+    }
+    when(value(2) === 2.B){
+      io.B := 255.U
+    }.otherwise{
+      io.B := 0.U
     }
   }
 }
