@@ -85,10 +85,6 @@ void renderChar(uint16_t x, uint16_t y, color color, char c) {
   }
 }
 
-void renderCharWhite(uint16_t x, uint16_t y, char c) {
-  return renderChar(x, y, white, c);
-}
-
 void renderText(uint16_t x, uint16_t y, color color, char *text) {
   uint16_t org_x = x;
 
@@ -104,8 +100,15 @@ void renderText(uint16_t x, uint16_t y, color color, char *text) {
   }
 }
 
-void renderTextWhite(uint16_t x, uint16_t y, char *text) {
-  return renderText(x, y, white, text);
+int line_y = 2;
+void vgaprintf(const char * format, ...) {
+  va_list arglist;
+
+  line_y += 18;
+  char buffer [100];
+
+  snprintf(buffer, 100, format, arglist);
+  renderText(20, line_y, white, buffer);
 }
 
 #define VGALib

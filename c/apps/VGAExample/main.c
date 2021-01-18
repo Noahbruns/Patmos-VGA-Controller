@@ -3,6 +3,11 @@
 
 #include "vga.h"
 
+#include <machine/patmos.h>
+#include <machine/exceptions.h>
+#include <machine/rtc.h>
+#include <machine/boot.h>
+
 void textAnimation();
 void text();
 void chess();
@@ -11,7 +16,7 @@ void cpuinfo();
 int main() {
   fill(black);
 
-
+  cpuinfo();
 
   return 0;
 }
@@ -40,33 +45,58 @@ void text() {
     "non curabitur.");
 }
 
+void prefix(int size, char* buf)  __attribute__((section(".text.spm")));
+void prefix(int size, char* buf){
+  int pref = 0;
+  while (size > 1024){
+    size = size >> 10;
+    pref++;
+  }
+  char* format;
+  switch(pref){
+    case 0:
+      format = "%d B";
+      break;
+    case 1:
+      format = "%d KB";
+      break;
+    case 2:
+      format = "%d MB";
+      break;
+    case 3:
+      format = "%d GB";
+      break;
+  }
+  snprintf(buf,11,format,size);
+  return;
+}
+
 void cpuinfo() {
-  printf("get_cpufeat(): %08x\n", get_cpufeat());
+  vgaprintf("get_cpufeat(): %08x\n", get_cpufeat());
   char buf[12];
   int size;
   size = get_extmem_size();
   prefix(size,buf);
-  printf("get_extmem_size(): %s\n", buf);
-  printf("get_extmem_conf(): %08x\n", get_extmem_conf());
+  vgaprintf("get_extmem_size(): %s\n", buf);
+  vgaprintf("get_extmem_conf(): %08x\n", get_extmem_conf());
   size = get_icache_size();
   prefix(size,buf);
-  printf("get_icache_size(): %s\n", buf);
-  printf("get_icache_conf(): %08x\n", get_icache_conf());
+  vgaprintf("get_icache_size(): %s\n", buf);
+  vgaprintf("get_icache_conf(): %08x\n", get_icache_conf());
   size = get_dcache_size();
   prefix(size,buf);
-  printf("get_dcache_size(): %s\n", buf);
-  printf("get_dcache_conf(): %08x\n", get_dcache_conf());
+  vgaprintf("get_dcache_size(): %s\n", buf);
+  vgaprintf("get_dcache_conf(): %08x\n", get_dcache_conf());
   size = get_scache_size();
   prefix(size,buf);
-  printf("get_scache_size(): %s\n", buf);
-  printf("get_scache_conf(): %08x\n", get_scache_conf());
+  vgaprintf("get_scache_size(): %s\n", buf);
+  vgaprintf("get_scache_conf(): %08x\n", get_scache_conf());
   size = get_ispm_size();
   prefix(size,buf);
-  printf("get_ispm_size(): %s\n", buf);
+  vgaprintf("get_ispm_size(): %s\n", buf);
   size = get_dspm_size();
   prefix(size,buf);
-  printf("get_dspm_size(): %s\n", buf);
-
+  vgaprintf("get_dspm_size(): %s\n", buf);
 }
 
 
