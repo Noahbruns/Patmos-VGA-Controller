@@ -20,8 +20,9 @@ void runPacman(int X, int Y, int toX, int toY);
 int main() {
   fill(black);
 
-  //runPacman(20, 20, 600, 400);
   pacman();
+
+  //Animation();
 
   return 0;
 }
@@ -71,11 +72,10 @@ void Animation() {
 
 
 void runPacman(int X, int Y, int toX, int toY) {
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 10; j++) {
-      writePixel(X + i, Y + j, red);
-    }
-  }
+  X -= 5;
+  Y -= 5;
+  toX -= 5;
+  toY -= 5;
 
   int dirX = toX > X ? 2 : -2;
 
@@ -101,7 +101,7 @@ void runPacman(int X, int Y, int toX, int toY) {
     }
     for (int i = 0; i < 10; i++) {
       writePixel(X + i, Y + 10, dirY > 0 ? red : black);
-      writePixel(X + i, Y + 11, dirY > 0 ? black : red);
+      writePixel(X + i, Y + 11, dirY > 0 ? red : black);
     }
     delay(10);
     Y += dirY;
@@ -125,6 +125,12 @@ void pacman() {
 
   int x = 20;
   int y = 300;
+
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 10; j++) {
+      writePixel(x + i, y + j, red);
+    }
+  }
 
   int num_packages = 100;
 
