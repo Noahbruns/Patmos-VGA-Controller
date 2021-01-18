@@ -174,7 +174,7 @@ void pacman() {
   int x = 20;
   int y = 300;
 
-  int num_packages = 100;
+  int num_packages = 10;
 
   for (int i = 0; i < num_packages; i++) {
     //generate random position
@@ -231,6 +231,8 @@ void prefix(int size, char* buf){
 }
 
 void cpuinfo() {
+  line_y = 2;
+
   vgaprintf("CPUINFO:\n");
   vgaprintf("get_cpu_cycles(): %d\n", get_cpu_cycles());
   vgaprintf("get_cpufeat(): %08x\n", get_cpufeat());
