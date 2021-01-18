@@ -100,7 +100,6 @@ void pacman() {
 
   for (int i = 0; i < num_packages; i++) {
     //generate random position
-    rand() % 8*SPEEDUP;
     int xrand = (rand() % VGA_DISPLAY_WIDTH/2) * 2;
     int yrand = (rand() % VGA_DISPLAY_HEIGTH/2) * 2;
     renderPackage(xrand, yrand, magenta);
