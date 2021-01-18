@@ -5,6 +5,7 @@ Libary for writing image to VGA Buffer
 #ifndef VGALib
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "ascii_8x13.h"
 #define FONT_WIDTH 8
@@ -16,23 +17,37 @@ Libary for writing image to VGA Buffer
 #define VGA_DISPLAY_HEIGHT 600
 
 typedef struct {
-    uint8_t R;
-    uint8_t G;
-    uint8_t B;
+    bool R;
+    bool G;
+    bool B;
 } color;
 
 const color black = {0, 0, 0};
-const color white = {255, 255, 255};
+const color white = {true, true, true};
 
-volatile uint16_t (*base)[VGA_DISPLAY_HEIGHT][VGA_DISPLAY_WIDTH] = 800000; //FIXME
+volatile uint8_t (*base)[VGA_DISPLAY_HEIGHT][VGA_DISPLAY_WIDTH / 2] = 800000; //FIXME
 
 void writePixel(uint16_t x, uint16_t y, color c) {
-    uint16_t temp = 0;
-    temp |= (c.R >> 3) << 10;
-    temp |= (c.G >> 3) << 5;
-    temp |= (c.B >> 3);
+    uint8_t reset;
+    uint8_t write = 0;
 
-    (*base)[y][x] = temp;
+    if (x % 2 == 0) {
+      reset = 0xF0;
+
+      write |= c.R << 8;
+      write |= c.G << 7;
+      write |= c.B << 6;
+    }
+    else {
+      reset = 0x0F;
+
+      write |= c.R << 4;
+      write |= c.G << 3;
+      write |= c.B << 2;
+    }
+
+    (*base)[y][x / 2] &= reset;
+    (*base)[y][x / 2] |= write;
 }
 
 color plus(color A, color B) {

@@ -41,11 +41,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
 
   val base_address = 800000.U(32.W)
 
-  val memory = Module(new LineMemory(line_width, 32))
-
-  val bytes_per_word  = data_width / 8         // number of bytes in every word
-  val bytes_per_pixel = 2                      // number bytes in each pixel
-  val pixel_per_word  = 2                      // number bytes in each pixel
+  val memory = Module(new LineMemory(line_width >> 2, 32))
 
   val wordAddress = RegInit(0.U(log2Ceil(line_width / pixel_per_word).W))     //counts the requested Bursts
   val burstCounter = RegInit(0.U(log2Ceil(burstLength).W))   //counts the recieved
@@ -57,7 +53,10 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   }
   val State = RegInit(0.U(2.W))
 
-  val read_v_pos = (io.v_pos + 1.U) % frame_height.U           // Next Line to read
+  val read_v_pos = (io.v_pos + 1.U) % frame_height.U 
+  
+  val bytes_per_word  = data_width / 8         // number of bytes in every word
+  val pixel_per_byte  = 2   // Next Line to read
 
   // Disable Write part
   io.memPort.M.Data := 0.U
@@ -74,7 +73,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   }
 
   io.memPort.M.Cmd := OcpCmd.IDLE
-  io.memPort.M.Addr := base_address + (read_v_pos * line_width.U * bytes_per_pixel.U) + wordAddress * bytes_per_word.U
+  io.memPort.M.Addr := base_address + (read_v_pos * (line_width.U >> 1)) + wordAddress * bytes_per_word.U //line_width.U / pixel_per_byte.U == line_width.U >> 1
   
   //Increment wordAddress, if data is valid and wordAddress smaller than line_width
   when(State === States.hold){
@@ -88,7 +87,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     }
   }
   when(State === States.fill){
-    memory.io.wrAddr := (read_v_pos(0) * (line_width.U >> 1)) + Cat(0.U(2.W), wordAddress)
+    memory.io.wrAddr := (read_v_pos(0) * (line_width.U >> 3)) + Cat(0.U(2.W), wordAddress)
     memory.io.wrData := io.memPort.S.Data
 
     when(io.memPort.S.Resp =/= OcpResp.NULL) {
@@ -96,7 +95,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
       memory.io.wrData := io.memPort.S.Data
       
       when(burstCounter === (burstLength - 1).U) {
-        when (wordAddress + 1.U < (line_width.U >> 1)) {// This word can still be written
+        when (wordAddress + 1.U < (line_width.U >> 3)) {// This word can still be written
           State := States.hold
         }
         .otherwise {
