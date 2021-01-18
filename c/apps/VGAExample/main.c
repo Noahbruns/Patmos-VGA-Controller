@@ -8,14 +8,21 @@ void gradientHorizontal(color from, color to);
 int main() {
   fill(black);
 
-  renderText(10, 10, white, "Patmos says: HELLO WORLD!");
 
+
+  return 0;
+}
+
+void textAnimation() {
   renderText(10, 60, white,
   "root@patmos:~# \n");
 
-  
   renderText(10, 60, white,
   "               _\n");
+}
+
+void text() {
+  renderText(10, 10, white, "Patmos says: HELLO WORLD!");
 
   renderText(10, 200, white,
     "Lorem ipsum dolor sit amet,\n"
@@ -28,8 +35,6 @@ int main() {
     "est pellentesque.\n"
     "Id volutpat lacus laoreet\n"
     "non curabitur.");
-
-  return 0;
 }
 
 
