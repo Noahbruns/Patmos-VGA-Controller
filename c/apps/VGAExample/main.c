@@ -3,7 +3,10 @@
 
 #include "vga.h"
 
-void gradientHorizontal(color from, color to);
+void textAnimation();
+void text();
+void chess();
+void cpuinfo();
 
 int main() {
   fill(black);
@@ -35,6 +38,35 @@ void text() {
     "est pellentesque.\n"
     "Id volutpat lacus laoreet\n"
     "non curabitur.");
+}
+
+void cpuinfo() {
+  printf("get_cpufeat(): %08x\n", get_cpufeat());
+  char buf[12];
+  int size;
+  size = get_extmem_size();
+  prefix(size,buf);
+  printf("get_extmem_size(): %s\n", buf);
+  printf("get_extmem_conf(): %08x\n", get_extmem_conf());
+  size = get_icache_size();
+  prefix(size,buf);
+  printf("get_icache_size(): %s\n", buf);
+  printf("get_icache_conf(): %08x\n", get_icache_conf());
+  size = get_dcache_size();
+  prefix(size,buf);
+  printf("get_dcache_size(): %s\n", buf);
+  printf("get_dcache_conf(): %08x\n", get_dcache_conf());
+  size = get_scache_size();
+  prefix(size,buf);
+  printf("get_scache_size(): %s\n", buf);
+  printf("get_scache_conf(): %08x\n", get_scache_conf());
+  size = get_ispm_size();
+  prefix(size,buf);
+  printf("get_ispm_size(): %s\n", buf);
+  size = get_dspm_size();
+  prefix(size,buf);
+  printf("get_dspm_size(): %s\n", buf);
+
 }
 
 
