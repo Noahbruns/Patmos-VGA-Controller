@@ -77,21 +77,38 @@ void runPacman(int fromX, int fromY, int toX, int toY) {
   }
 }
 
+//Prints a cross representing the packages
+void renderPackage(int x, int y, color c) {
+  int sizeX = 10;
+
+  for (int i = 0; i < sizeX; i++) {
+      writePixel(x + i, y + i, c);
+      writePixel(x + i, y - i, c);
+      writePixel(x - i, y + i, c);
+      writePixel(x - i, y - i, c);
+    }
+  }
+}
+
 void pacman() {
   fill(black);
 
   int x = 20;
   int y = 300;
 
-  int stepX = 1;
-  int stepY = 0;
+  int num_packages = 100;
 
-  for (int i = 0; i < 600; i++) {
-    renderPacman(x, y, 0, red);
-    delay(10);
-    renderPacman(x, y, 0, black);
-    x += stepX;
-    y += stepY;
+  for (int i = 0; i < num_packages; i++) {
+    //generate random position
+    rand() % 8*SPEEDUP;
+    int xrand = (rand() % VGA_DISPLAY_WIDTH/2) * 2;
+    int yrand = (rand() % VGA_DISPLAY_HEIGTH/2) * 2;
+    renderPackage(xrand, yrand, magenta);
+
+    runPacman(x,y, xrand, yrand);
+    renderPackage(xrand, yrand, black);
+    x = xrand;
+    y = yrand;
   }
 }
 
