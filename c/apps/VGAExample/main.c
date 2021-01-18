@@ -14,11 +14,12 @@ void chess();
 void cpuinfo();
 void snake();
 void pacman();
+void runPacman(int X, int Y, int toX, int toY);
 
 int main() {
   fill(black);
 
-  Animation();
+  runPacman(20, 20, 600, 400);
 
   return 0;
 }
@@ -66,14 +67,42 @@ void Animation() {
   pacman();
 }
 
-void runPacman(int fromX, int fromY, int toX, int toY) {
-  int sizeX = 10;
-  int sizeY = 10;
 
-  for (int i = 0; i < sizeX; i++) {
-    for (int j = 0; j < sizeY; j++) {
-      writePixel(x + i, y + j, c);
+void runPacman(int X, int Y, int toX, int toY) {
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 10; j++) {
+      writePixel(X + i, Y + j, red);
     }
+  }
+
+  int dirX = toX > X ? 2 : -2;
+
+  while(X != toX) {
+    for (int i = 0; i < 10; i++) {
+      writePixel(X, Y + i, dirX > 0 ? black : red);
+      writePixel(X + 1, Y + i, dirX > 0 ? black : red);
+    }
+    for (int i = 0; i < 10; i++) {
+      writePixel(X + 10, Y + i, dirX > 0 ? red : black);
+      writePixel(X + 11, Y + i, dirX > 0 ? red : black);
+    }
+    delay(10);
+    X += dirX;
+  }
+
+  int dirY = toY > Y ? 2 : -2;
+
+  while(Y != toY) {
+    for (int i = 0; i < 10; i++) {
+      writePixel(X + i, Y, dirY > 0 ? black : red);
+      writePixel(X + i, Y + 1, dirY > 0 ? black : red);
+    }
+    for (int i = 0; i < 10; i++) {
+      writePixel(X + i, Y + 10, dirY > 0 ? red : black);
+      writePixel(X + i, Y + 11, dirY > 0 ? black : red);
+    }
+    delay(10);
+    Y += dirY;
   }
 }
 
