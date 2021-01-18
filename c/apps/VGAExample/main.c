@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "vga.h"
 
@@ -19,7 +20,8 @@ void runPacman(int X, int Y, int toX, int toY);
 int main() {
   fill(black);
 
-  runPacman(20, 20, 600, 400);
+  //runPacman(20, 20, 600, 400);
+  pacman();
 
   return 0;
 }
@@ -111,11 +113,10 @@ void renderPackage(int x, int y, color c) {
   int sizeX = 10;
 
   for (int i = 0; i < sizeX; i++) {
-      writePixel(x + i, y + i, c);
-      writePixel(x + i, y - i, c);
-      writePixel(x - i, y + i, c);
-      writePixel(x - i, y - i, c);
-    }
+    writePixel(x + i, y + i, c);
+    writePixel(x + i, y - i, c);
+    writePixel(x - i, y + i, c);
+    writePixel(x - i, y - i, c);
   }
 }
 
@@ -130,7 +131,7 @@ void pacman() {
   for (int i = 0; i < num_packages; i++) {
     //generate random position
     int xrand = (rand() % VGA_DISPLAY_WIDTH/2) * 2;
-    int yrand = (rand() % VGA_DISPLAY_HEIGTH/2) * 2;
+    int yrand = (rand() % VGA_DISPLAY_HEIGHT/2) * 2;
     renderPackage(xrand, yrand, magenta);
 
     runPacman(x,y, xrand, yrand);
