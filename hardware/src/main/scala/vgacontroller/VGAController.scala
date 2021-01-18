@@ -54,31 +54,44 @@ class VGAController(extmem_addr_width: Int, data_width: Int, burst_length: Int) 
 
   val v_cntReg = RegInit(0.U(log2Ceil(frame_height).W))
   val h_cntReg = RegInit(0.U(log2Ceil(frame_width).W))
+  val next_h_cntReg = WireDefault(0.U(log2Ceil(frame_width).W))
 
   /* Generate Pixel buffer */
   val PixelBuffer = Module(new PixelBuffer(h_display, v_display, frame_height, frame_width, extmem_addr_width, data_width, burst_length))
   
   PixelBuffer.io.new_frame := io.new_frame // Add synchronizer
-  PixelBuffer.io.enable := io.n_blank
   PixelBuffer.io.pixel_clock := pixel_clock
   PixelBuffer.io.h_pos := h_cntReg
+  PixelBuffer.io.next_h_pos := next_h_cntReg
   PixelBuffer.io.v_pos := v_cntReg
   PixelBuffer.io.blank := io.blank
 
   io.memPort <> PixelBuffer.io.memPort
 
+  PixelBuffer.io.enable := (h_cntReg < h_display.U && v_cntReg < v_display.U)
+
   io.R := PixelBuffer.io.R
   io.G := PixelBuffer.io.G
   io.B := PixelBuffer.io.B
 
-  // Generate Counter
   when(~pixel_clock) {
-    h_cntReg := h_cntReg + 1.U
+    next_h_cntReg := h_cntReg + 1.U
+  }
+  .otherwise {
+    next_h_cntReg := h_cntReg
   }
 
   when(h_cntReg === (frame_width - 1).U && ~pixel_clock) {
-    h_cntReg := 0.U
-    v_cntReg := v_cntReg + 1.U
+    next_h_cntReg := 0.U
+  }
+  
+  // Generate Counter
+  when(~pixel_clock) {
+    h_cntReg := next_h_cntReg
+
+    when(next_h_cntReg === 0.U) {
+      v_cntReg := v_cntReg + 1.U
+    }
   }
 
   when(v_cntReg === frame_height.U) {

@@ -32,7 +32,7 @@ class VGACoreTestBench() extends Module {
     core.io.memPort.S.CmdAccept := true.B
   }
 
-  core.io.memPort.S.Data := "hFFFF0000".U
+  core.io.memPort.S.Data := "hF000F000".U
 
   when(count > 0.U && count < 5.U) {
     core.io.memPort.S.Resp := OcpResp.DVA

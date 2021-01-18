@@ -24,6 +24,12 @@ typedef struct {
 
 const color black = {0, 0, 0};
 const color white = {true, true, true};
+const color red = {true, false, false};
+const color blue = {false, true, false};
+const color green = {false, false, true};
+const color yellow = {true, true, false};
+const color cyan = {false, true, true};
+const color magenta = {true, false, true};
 
 volatile uint8_t (*base)[VGA_DISPLAY_HEIGHT][VGA_DISPLAY_WIDTH / 2] = 800000; //FIXME
 
@@ -32,18 +38,18 @@ void writePixel(uint16_t x, uint16_t y, color c) {
     uint8_t write = 0;
 
     if (x % 2 == 0) {
-      reset = 0xF0;
-
-      write |= c.R << 8;
-      write |= c.G << 7;
-      write |= c.B << 6;
-    }
-    else {
       reset = 0x0F;
 
-      write |= c.R << 4;
-      write |= c.G << 3;
-      write |= c.B << 2;
+      write |= c.R << 6;
+      write |= c.G << 5;
+      write |= c.B << 4;
+    }
+    else {
+      reset = 0xF0;
+
+      write |= c.R << 2;
+      write |= c.G << 1;
+      write |= c.B << 0;
     }
 
     (*base)[y][x / 2] &= reset;
@@ -66,7 +72,7 @@ void blank() {
   fill(black);
 }
 
-void renderChar(uint16_t x, uint16_t y, char c, color color) {
+void renderChar(uint16_t x, uint16_t y, color color, char c) {
   for (int i = 0; i < FONT_HEIGHT; i++) {
     for (int j = 0; j < FONT_WIDTH; j++) {
       if (c <= 32 || c > 127)
@@ -80,10 +86,10 @@ void renderChar(uint16_t x, uint16_t y, char c, color color) {
 }
 
 void renderCharWhite(uint16_t x, uint16_t y, char c) {
-  return renderChar(x, y, c, white);
+  return renderChar(x, y, white, c);
 }
 
-void renderText(uint16_t x, uint16_t y, char *text, color color) {
+void renderText(uint16_t x, uint16_t y, color color, char *text) {
   uint16_t org_x = x;
 
   for (int i = 0; text[i] != 0; i++) {
@@ -93,13 +99,13 @@ void renderText(uint16_t x, uint16_t y, char *text, color color) {
       continue;
     }
 
-    renderChar(x, y, text[i], color);
+    renderChar(x, y, color, text[i]);
     x += FONT_WIDTH + FONT_SPACE;
   }
 }
 
 void renderTextWhite(uint16_t x, uint16_t y, char *text) {
-  return renderText(x, y, text, white);
+  return renderText(x, y, white, text);
 }
 
 #define VGALib

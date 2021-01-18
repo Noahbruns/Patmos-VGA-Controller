@@ -33,6 +33,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     val G = Output(UInt(8.W))
     val B = Output(UInt(8.W))
     val h_pos = Input(UInt(log2Ceil(frame_width).W))
+    val next_h_pos = Input(UInt(log2Ceil(frame_width).W))
     val v_pos = Input(UInt(log2Ceil(frame_height).W))
 
     val memPort = new OcpBurstMasterPort(extmem_addr_width, data_width, burstLength)
@@ -43,7 +44,10 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
 
   val memory = Module(new LineMemory(line_width >> 2, 32))
 
-  val wordAddress = RegInit(0.U(log2Ceil(line_width / pixel_per_word).W))     //counts the requested Bursts
+  val bytes_per_word  = data_width / 8         // number of bytes in every word
+  val pixel_per_byte  = 2   // Next Line to read
+
+  val wordAddress = RegInit(0.U(log2Ceil(line_width >> 2).W))     //counts the requested Bursts
   val burstCounter = RegInit(0.U(log2Ceil(burstLength).W))   //counts the recieved
   
   object States {
@@ -54,9 +58,6 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   val State = RegInit(0.U(2.W))
 
   val read_v_pos = (io.v_pos + 1.U) % frame_height.U 
-  
-  val bytes_per_word  = data_width / 8         // number of bytes in every word
-  val pixel_per_byte  = 2   // Next Line to read
 
   // Disable Write part
   io.memPort.M.Data := 0.U
@@ -110,13 +111,13 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   /* Write Out */
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories
     when(io.enable === 1.U) {
-      memory.io.rdAddr := io.h_pos >> 3
+      memory.io.rdAddr := io.next_h_pos >> 3
     }.otherwise {
       memory.io.rdAddr := line_width.U >> 3 // Prepare for next line
     }
   }.otherwise{
     when(io.enable === 1.U) {
-      memory.io.rdAddr := (Cat(0.U(1.W), io.h_pos) + line_width.U) >> 3 // Best approach???
+      memory.io.rdAddr := (Cat(0.U(1.W), io.next_h_pos) + line_width.U) >> 3 // Best approach???
     }.otherwise {
       memory.io.rdAddr := 0.U // Prepare for next line
     }
@@ -127,10 +128,36 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   io.G := 0.U
   io.B := 0.U
   when(io.enable === 1.U) {
-    val addr = io.h_pos(1,0)
-    val value = rdData(4.U*addr, 4.U*addr+3.U)
+    val addr = io.h_pos(2,0)
+    val value = WireDefault(0.U(4.W))
 
-    when(value(0) === 1.B){
+    //multiplex pixel value
+    when(addr === 0.U){
+      value := rdData(31, 28)
+    }
+    when(addr === 1.U){
+      value := rdData(27, 24)
+    }
+    when(addr === 2.U){
+      value := rdData(23, 20)
+    }
+    when(addr === 3.U){
+      value := rdData(19, 16)
+    }
+    when(addr === 4.U){
+      value := rdData(15, 12)
+    }
+    when(addr === 5.U){
+      value := rdData(11, 8)
+    }
+    when(addr === 6.U){
+      value := rdData(7, 4)
+    }
+    when(addr === 7.U){
+      value := rdData(3, 0)
+    }
+
+    when(value(2) === 1.B){
       io.R := 255.U
     }.otherwise{
       io.R := 0.U
@@ -140,7 +167,7 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
     }.otherwise{
       io.G := 0.U
     }
-    when(value(2) === 2.B){
+    when(value(0) === 1.B){
       io.B := 255.U
     }.otherwise{
       io.B := 0.U

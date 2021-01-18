@@ -6,13 +6,18 @@
 void gradientHorizontal(color from, color to);
 
 int main() {
-  fill((color){23, 92, 138});
-  renderTextWhite(10, 10, "Patmos says: HELLO WORLD!");
+  fill(black);
 
-  renderTextWhite(10, 60, 
+  renderText(10, 10, white, "Patmos says: HELLO WORLD!");
+
+  renderText(10, 60, white,
   "root@patmos:~# \n");
 
-  renderTextWhite(10, 200, 
+  
+  renderText(10, 60, white,
+  "               _\n");
+
+  renderText(10, 200, white,
     "Lorem ipsum dolor sit amet,\n"
     "consectetur adipiscing elit,\n"
     "sed do eiusmod tempor incididunt\n"
@@ -24,36 +29,19 @@ int main() {
     "Id volutpat lacus laoreet\n"
     "non curabitur.");
 
-  /*for (int i = 0; i < VGA_DISPLAY_WIDTH; i++) {
-    for (int j = 0; j < VGA_DISPLAY_HEIGHT; j++) {
-      //writePixel(i, j, (color){255, 255, 255});
-
-      if ((i / 100 + j / 100) % 2 == 0) {
-        writePixel(i, j, (color){255, 255, 255});
-      }
-      else {
-        writePixel(i, j, (color){0, 0, 0});
-      }
-    }
-  }*/
-
-  //gradientHorizontal((color){255, 255, 255}, (color){0, 0, 0});
-  //gradientHorizontal((color){59, 29, 111}, (color){253, 174, 128});
-
   return 0;
 }
 
 
-void gradientHorizontal(color from, color to) {
-  int R = to.R - from.R;
-  int G = to.G - from.G;
-  int B = to.B - from.B;
-
+void chess() {
   for (int i = 0; i < VGA_DISPLAY_WIDTH; i++) {
-    color c = plus(from, (color){(int)(R * i) / VGA_DISPLAY_WIDTH, (int)(G * i) / VGA_DISPLAY_WIDTH, (int)(B * i) / VGA_DISPLAY_WIDTH});
-
     for (int j = 0; j < VGA_DISPLAY_HEIGHT; j++) {
-      writePixel(i, j, c);
+      if ((i / 100 + j / 100) % 2 == 0) {
+        writePixel(i, j, white);
+      }
+      else {
+        writePixel(i, j, black);
+      }
     }
   }
 }
