@@ -6,9 +6,7 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.loadMemoryFromFile
 
-class LineMemory(line_width: Int, bits: Int) extends Module {
-  val size = 1024
-
+class LineMemory(size: Int, bits: Int) extends Module {
   val io = IO(new Bundle {
     val rdAddr = Input(UInt(log2Ceil(size).W)) 
     val rdData = Output(UInt(bits.W)) 
@@ -113,13 +111,13 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   /* Write Out */
   when(io.v_pos(0) === 0.B) { // Switch between Dual Memories
     when(io.enable === 1.U) {
-      memory.io.rdAddr := io.h_pos >> 1
+      memory.io.rdAddr := io.h_pos >> 3
     }.otherwise {
-      memory.io.rdAddr := line_width.U >> 1 // Prepare for next line
+      memory.io.rdAddr := line_width.U >> 3 // Prepare for next line
     }
   }.otherwise{
     when(io.enable === 1.U) {
-      memory.io.rdAddr := (Cat(0.U(1.W), io.h_pos) + line_width.U) >> 1 // Best approach???
+      memory.io.rdAddr := (Cat(0.U(1.W), io.h_pos) + line_width.U) >> 3 // Best approach???
     }.otherwise {
       memory.io.rdAddr := 0.U // Prepare for next line
     }
@@ -130,6 +128,9 @@ class PixelBuffer(line_width: Int, display_height: Int, frame_height: Int, frame
   io.G := 0.U
   io.B := 0.U
   when(io.enable === 1.U) {
+    var addr  = io.h_pos(2, 0)
+    var value = rdData(addr, addr + 3)
+    
     when(io.h_pos(0) === 1.U) {
       io.R := rdData(14, 10) << 3
       io.G := rdData(9, 5) << 3
