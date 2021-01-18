@@ -21,9 +21,7 @@ void runPacman(int X, int Y, int toX, int toY);
 int main() {
   fill(black);
 
-  pacman();
-
-  //Animation();
+  while (true) {Animation();}
 
   return 0;
 }
@@ -71,52 +69,91 @@ void Animation() {
   pacman();
 }
 
-
 void runPacman(int X, int Y, int toX, int toY) {
   X -= 5;
   Y -= 5;
   toX -= 5;
   toY -= 5;
 
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 10; j++) {
+      writePixel(X + i, Y + j, red);
+    }
+  }
+
   int dirX = toX > X ? 2 : -2;
 
   while(X != toX) {
-    for (int i = 0; i < 10; i++) {
-      writePixel(X, Y + i, dirX > 0 ? black : red);
-      writePixel(X + 1, Y + i, dirX > 0 ? black : red);
+    if (dirX > 0) {
+      for (int i = 0; i < 10; i++) {
+        writePixel(X, Y + i, black);
+        writePixel(X + 1, Y + i, black);
+      }
+      for (int i = 0; i < 10; i++) {
+        writePixel(X + 10, Y + i, red);
+        writePixel(X + 11, Y + i, red);
+      }
     }
-    for (int i = 0; i < 10; i++) {
-      writePixel(X + 10, Y + i, dirX > 0 ? red : black);
-      writePixel(X + 11, Y + i, dirX > 0 ? red : black);
+    else {
+      for (int i = 0; i < 10; i++) {
+        writePixel(X - 2, Y + i, red);
+        writePixel(X - 1, Y + i, red);
+      }
+      for (int i = 0; i < 10; i++) {
+        writePixel(X + 8, Y + i, black);
+        writePixel(X + 9, Y + i, black);
+      }
     }
-    delay(10);
+    delay(5);
     X += dirX;
   }
 
   int dirY = toY > Y ? 2 : -2;
 
   while(Y != toY) {
-    for (int i = 0; i < 10; i++) {
-      writePixel(X + i, Y, dirY > 0 ? black : red);
-      writePixel(X + i, Y + 1, dirY > 0 ? black : red);
+    if (dirY > 0) {
+      for (int i = 0; i < 10; i++) {
+        writePixel(X + i, Y, black);
+        writePixel(X + i, Y + 1, black);
+      }
+      for (int i = 0; i < 10; i++) {
+        writePixel(X + i, Y + 10, red);
+        writePixel(X + i, Y + 11, red);
+      }
     }
-    for (int i = 0; i < 10; i++) {
-      writePixel(X + i, Y + 10, dirY > 0 ? red : black);
-      writePixel(X + i, Y + 11, dirY > 0 ? red : black);
+    else {
+      for (int i = 0; i < 10; i++) {
+        writePixel(X + i, Y - 2, red);
+        writePixel(X + i, Y - 1, red);
+      }
+      for (int i = 0; i < 10; i++) {
+        writePixel(X + i, Y + 8, black);
+        writePixel(X + i, Y + 9, black);
+      }
     }
-    delay(10);
+    delay(5);
     Y += dirY;
   }
-}
-
-void renderPackageFound(int x, int y, color c){
-  int radius = 20;
-  for(float i = 0; i < 2*3.14; i+=0.1){
-    int x_tmp = radius*16*pow(sin(i),3);
-    int y_tmp = -radius*(13*cos(i) - 5*cos(2*i) -2*cos(3*i) - cos(4*i));
-    writePixel(x + x_tmp, y + y_tmp, c);
+  
+  for (int i = -5; i < 20; i++) {
+    for (int j = -5; j < 20; j++) {
+      writePixel(X + i, Y + j, yellow);
+    }
   }
 
+  delay(200);
+
+  for (int i = -5; i < 20; i++) {
+    for (int j = -5; j < 20; j++) {
+      writePixel(X + i, Y + j, black);
+    }
+  }
+
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 10; j++) {
+      writePixel(X + i, Y + j, red);
+    }
+  }
 }
 
 //Prints a cross representing the packages
@@ -137,12 +174,6 @@ void pacman() {
   int x = 20;
   int y = 300;
 
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 10; j++) {
-      writePixel(x + i, y + j, red);
-    }
-  }
-
   int num_packages = 100;
 
   for (int i = 0; i < num_packages; i++) {
@@ -152,7 +183,6 @@ void pacman() {
     renderPackage(xrand, yrand, magenta);
 
     runPacman(x,y, xrand, yrand);
-    renderPackageFound(xrand, yrand, red);
     x = xrand;
     y = yrand;
   }
