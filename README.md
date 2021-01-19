@@ -1,3 +1,8 @@
+VGA Controller
+==============
+
+This Fork implements a VGA Controller that connects through the Patmos Arbiter to the SRAM. Using the VGA Library (c/apps/VGAExample) Pixels as well as Text can be written to the VGA Output. The Color depth is 1 Bit per Color so altogether 6 Colors plus white and red can be displayed.
+
 About Patmos
 ============
 
