@@ -78,7 +78,7 @@ void runPacman(int X, int Y, int toX, int toY) {
 
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 10; j++) {
-      writePixel(X + i, Y + j, red);
+      writePixelSafe(X + i, Y + j, red);
     }
   }
 
@@ -87,22 +87,22 @@ void runPacman(int X, int Y, int toX, int toY) {
   while(X != toX) {
     if (dirX > 0) {
       for (int i = 0; i < 10; i++) {
-        writePixel(X, Y + i, black);
-        writePixel(X + 1, Y + i, black);
+        writePixelSafe(X, Y + i, black);
+        writePixelSafe(X + 1, Y + i, black);
       }
       for (int i = 0; i < 10; i++) {
-        writePixel(X + 10, Y + i, red);
-        writePixel(X + 11, Y + i, red);
+        writePixelSafe(X + 10, Y + i, red);
+        writePixelSafe(X + 11, Y + i, red);
       }
     }
     else {
       for (int i = 0; i < 10; i++) {
-        writePixel(X - 2, Y + i, red);
-        writePixel(X - 1, Y + i, red);
+        writePixelSafe(X - 2, Y + i, red);
+        writePixelSafe(X - 1, Y + i, red);
       }
       for (int i = 0; i < 10; i++) {
-        writePixel(X + 8, Y + i, black);
-        writePixel(X + 9, Y + i, black);
+        writePixelSafe(X + 8, Y + i, black);
+        writePixelSafe(X + 9, Y + i, black);
       }
     }
     delay(5);
@@ -114,22 +114,22 @@ void runPacman(int X, int Y, int toX, int toY) {
   while(Y != toY) {
     if (dirY > 0) {
       for (int i = 0; i < 10; i++) {
-        writePixel(X + i, Y, black);
-        writePixel(X + i, Y + 1, black);
+        writePixelSafe(X + i, Y, black);
+        writePixelSafe(X + i, Y + 1, black);
       }
       for (int i = 0; i < 10; i++) {
-        writePixel(X + i, Y + 10, red);
-        writePixel(X + i, Y + 11, red);
+        writePixelSafe(X + i, Y + 10, red);
+        writePixelSafe(X + i, Y + 11, red);
       }
     }
     else {
       for (int i = 0; i < 10; i++) {
-        writePixel(X + i, Y - 2, red);
-        writePixel(X + i, Y - 1, red);
+        writePixelSafe(X + i, Y - 2, red);
+        writePixelSafe(X + i, Y - 1, red);
       }
       for (int i = 0; i < 10; i++) {
-        writePixel(X + i, Y + 8, black);
-        writePixel(X + i, Y + 9, black);
+        writePixelSafe(X + i, Y + 8, black);
+        writePixelSafe(X + i, Y + 9, black);
       }
     }
     delay(5);
@@ -138,7 +138,7 @@ void runPacman(int X, int Y, int toX, int toY) {
   
   for (int i = -5; i < 20; i++) {
     for (int j = -5; j < 20; j++) {
-      writePixel(X + i, Y + j, yellow);
+      writePixelSafe(X + i, Y + j, yellow);
     }
   }
 
@@ -146,13 +146,13 @@ void runPacman(int X, int Y, int toX, int toY) {
 
   for (int i = -5; i < 20; i++) {
     for (int j = -5; j < 20; j++) {
-      writePixel(X + i, Y + j, black);
+      writePixelSafe(X + i, Y + j, black);
     }
   }
 
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 10; j++) {
-      writePixel(X + i, Y + j, red);
+      writePixelSafe(X + i, Y + j, red);
     }
   }
 }
@@ -162,10 +162,10 @@ void renderPackage(int x, int y, color c) {
   int sizeX = 10;
 
   for (int i = 0; i < sizeX; i++) {
-    writePixel(x + i, y + i, c);
-    writePixel(x + i, y - i, c);
-    writePixel(x - i, y + i, c);
-    writePixel(x - i, y - i, c);
+    writePixelSafe(x + i, y + i, c);
+    writePixelSafe(x + i, y - i, c);
+    writePixelSafe(x - i, y + i, c);
+    writePixelSafe(x - i, y - i, c);
   }
 }
 
