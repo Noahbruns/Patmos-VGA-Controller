@@ -35,6 +35,7 @@ void delay(int ms) {
 }
 
 void Animation() {
+  fill(black);
   renderText(10, 20, white, "Loading");
 
   int x = 10 + 7 * (FONT_WIDTH + FONT_SPACE) + FONT_SPACE;

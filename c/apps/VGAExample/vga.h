@@ -34,6 +34,9 @@ const color magenta = {true, false, true};
 volatile uint8_t (*base)[VGA_DISPLAY_HEIGHT][VGA_DISPLAY_WIDTH / 2] = 800000; //FIXME
 
 void writePixel(uint16_t x, uint16_t y, color c) {
+    if (x > VGA_DISPLAY_WIDTH || y > VGA_DISPLAY_HEIGHT)
+      return;
+
     uint8_t reset;
     uint8_t write = 0;
 
