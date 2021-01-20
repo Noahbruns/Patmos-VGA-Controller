@@ -16,20 +16,22 @@ Libary for writing image to VGA Buffer
 #define VGA_DISPLAY_WIDTH  800
 #define VGA_DISPLAY_HEIGHT 600
 
-typedef struct {
+/*typedef struct {
     bool R;
     bool G;
     bool B;
-} color;
+} color;*/
 
-const color black = {0, 0, 0};
-const color white = {true, true, true};
-const color red = {true, false, false};
-const color blue = {false, true, false};
-const color green = {false, false, true};
-const color yellow = {true, true, false};
-const color cyan = {false, true, true};
-const color magenta = {true, false, true};
+typedef uint8_t color;
+
+const color black =  0b000; //{true, true, true};
+const color white = 0b111; //{true, true, true};
+const color red = 0b100; //{true, false, false};
+const color blue = 0b010; //{false, true, false};
+const color green = 0b001; //{false, false, true};
+const color yellow = 0b110; //{true, true, false};
+const color cyan = 0b011; //{false, true, true};
+const color magenta = 0b101; //{true, false, true};
 
 volatile uint8_t (*base)[VGA_DISPLAY_HEIGHT][VGA_DISPLAY_WIDTH / 2] = 800000; //FIXME
 
@@ -40,16 +42,12 @@ void writePixel(uint16_t x, uint16_t y, color c) {
   if (x % 2 == 0) {
     reset = 0x0F;
 
-    write |= c.R << 6;
-    write |= c.G << 5;
-    write |= c.B << 4;
+    write |= c << 4;
   }
   else {
     reset = 0xF0;
 
-    write |= c.R << 2;
-    write |= c.G << 1;
-    write |= c.B << 0;
+    write |= c;
   }
 
   (*base)[y][x / 2] &= reset;
@@ -59,10 +57,6 @@ void writePixel(uint16_t x, uint16_t y, color c) {
 void writePixelSafe(uint16_t x, uint16_t y, color c) {
   if (x <= VGA_DISPLAY_WIDTH && y <= VGA_DISPLAY_HEIGHT)
     writePixel(x, y, c);
-}
-
-color plus(color A, color B) {
-  return (color){A.R + B.R, A.G + B.G, A.B + B.B};
 }
 
 void fill(color c) {

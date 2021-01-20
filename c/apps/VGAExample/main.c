@@ -12,7 +12,7 @@
 
 void Animation();
 void text();
-void chess();
+void chess(color A, color B);
 void cpuinfo();
 void snake();
 void pacman();
@@ -235,7 +235,7 @@ void cpuinfo() {
   line_y = 2;
 
   vgaprintf("CPUINFO:\n");
-  vgaprintf("get_cpu_cycles(): %d\n", get_cpu_cycles());
+  vgaprintf("get_cpu_cycles(): %ud\n", get_cpu_cycles());
   vgaprintf("get_cpufeat(): %08x\n", get_cpufeat());
   char buf[12];
   int size;
